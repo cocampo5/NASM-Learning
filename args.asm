@@ -11,17 +11,17 @@ SECTION     .data
 ;szErrMsg    db      "Too many arguments.  The max number of args is 4", 10
 ;ERRLEN      equ     $-szErrMsg
 
-szLineFeed  db      10 ;un \n
-noArgus: db 'No ha ingresado argumentos! Usage: exe -e | -f | -i',10;Mensaje a mostrar si no hay args
+szLineFeed  dw      10 ;un \n
+noArgus: dw 'No ha ingresado argumentos! Usage: exe -e | -f | -i',10;Mensaje a mostrar si no hay args
 noArgusLong: equ $-noArgus ;longitud
 
-mensaje: db 'esfewrf',10
+mensaje: dw 'esfewrf',10
 mensajel equ $-mensaje
 
-arge: db '-e';arg -e
+arge: dw '-e';arg -e
 argeLong: equ $-arge
-argf: db '-f';arg -f
-argi: db '-i';arg -i
+argf: dw '-f';arg -f
+argi: dw '-i';arg -i
 
 SECTION     .text
 
@@ -115,3 +115,4 @@ Exit:
     mov     eax, sys_exit
     xor     ebx, ebx
     int     80H
+;
