@@ -10,7 +10,18 @@ SECTION     .data
 
 ;szErrMsg    db      "Too many arguments.  The max number of args is 4", 10
 ;ERRLEN      equ     $-szErrMsg
-szLineFeed  db      10
+
+szLineFeed  db      10 ;un \n
+noArgus: db 'No ha ingresado argumentos! Usage: exe -e | -f | -i',10;Mensaje a mostrar si no hay args
+noArgusLong: equ $-noArgus ;longitud
+
+mensaje: db 'esfewrf',10
+mensajel equ $-mensaje
+
+arge: db '-e';arg -e
+argeLong: equ $-arge
+argf: db '-f';arg -f
+argi: db '-i';arg -i
 
 SECTION     .text
 
@@ -38,41 +49,37 @@ DoNextArg:
     call    DisplayNorm                     ; display arg text normally
     pop     edi                             ; move string length into edi
     mov     esi, dword [ebp + 4 * ebx]
-    call    ReverseIt                       ; now display in reverse
     inc     ebx                             ; step arg array index
     jmp     DoNextArg
-ReverseIt:
-    push    ebx
-    add     esi, edi
-Next:
+
+NoArgs:
+   ; No args entered,
+   ; start program without args here
+    mov eax,sys_write      ; call system 'write' id 4 
+    mov ebx,stdout         ; descriptor de archivo 1 = pantalla 
+    mov ecx,noArgus   ; guardo la cadena en un registro ecx 
+    mov edx,noArgusLong   ; guardo la cadena en un registro edx 
+    int 80h                 ; interrupcion para invocar al kernel           
+    jmp     Exit
+
+DisplayNorm:
+    ;cmp ebx,arge
+    ;je EsArgE
+    push    ebx ;Esto me imprime el argumento que ingreso
     mov     eax, sys_write
     mov     ebx, stdout
-    mov     ecx, esi
-    mov     edx, 1
-    int     80H   
-    dec     esi
-    dec     edi
-    jns     Next
-    mov     ecx, szLineFeed
+    int     80H 
+
+    ;pop     ebx ;no entiendo para que carajos esto
+
+    mov     ecx, szLineFeed ;Esto imprime \n
     mov     edx, 1
     mov     eax, sys_write
     mov     ebx, stdout
     int     80H
-
-    pop     ebx
-
-    ret
-NoArgs:
-   ; No args entered,
-   ; start program without args here
-    jmp     Exit
-DisplayNorm:
-    push    ebx
-    mov     eax, sys_write
-    mov     ebx, stdout
-    int     80H 
     pop     ebx
     ret
+
 GetStrlen:
     push    ebx
     xor     ecx, ecx
@@ -85,6 +92,7 @@ GetStrlen:
     pop     ebx
     lea     edx, [ecx - 1]
     ret
+
 ; TooManyArgs:
 ;     mov     eax, sys_write
 ;     mov     ebx, stdout
@@ -92,7 +100,16 @@ GetStrlen:
 ;     mov     edx, ERRLEN
 ;     int     80H
 
+EsArgE:
+    mov eax,sys_write      ; call system 'write' id 4 
+    mov ebx,stdout         ; descriptor de archivo 1 = pantalla 
+    mov ecx,mensaje   ; guardo la cadena en un registro ecx 
+    mov edx,mensajel   ; guardo la cadena en un registro edx 
+    int 80h                 ; interrupcion para invocar al kernel 
+    jmp Exit
+
 Exit:
+
     mov     esp, ebp
     pop     ebp
     mov     eax, sys_exit
