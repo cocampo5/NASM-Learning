@@ -63,22 +63,31 @@ NoArgs:
     jmp     Exit
 
 DisplayNorm:
-    ;cmp ebx,arge
-    ;je EsArgE
-    push    ebx ;Esto me imprime el argumento que ingreso
-    mov     eax, sys_write
-    mov     ebx, stdout
-    int     80H 
 
-    ;pop     ebx ;no entiendo para que carajos esto
 
-    mov     ecx, szLineFeed ;Esto imprime \n
-    mov     edx, 1
-    mov     eax, sys_write
-    mov     ebx, stdout
-    int     80H
-    pop     ebx
-    ret
+    ; push    ebx ;Esto me imprime el argumento que ingreso
+    ; mov     eax, sys_write
+    ; mov     ebx, stdout
+    ; int     80H 
+    ; mov     ecx, szLineFeed ;Esto imprime \n
+    ; mov     edx, 1
+    ; mov     eax, sys_write
+    ; mov     ebx, stdout
+    ; int     80H
+    ; pop     ebx
+    ; ret
+
+
+CmpStrs:        
+
+
+StrsNotEqual:
+    mov eax,sys_write      ; call system 'write' id 4 
+    mov ebx,stdout         ; descriptor de archivo 1 = pantalla 
+    mov ecx,mensaje   ; guardo la cadena en un registro ecx 
+    mov edx,mensajel   ; guardo la cadena en un registro edx 
+    int 80h                 ; interrupcion para invocar al kernel 
+    jmp Exit
 
 GetStrlen:
     push    ebx
