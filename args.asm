@@ -12,7 +12,7 @@ SECTION     .data
 ;ERRLEN      equ     $-szErrMsg
 
 szLineFeed  dw      10 ;un \n
-noArgus: dw 'No ha ingresado argumentos! Usage: exe -e | -f | -i',10;Mensaje a mostrar si no hay args
+noArgus: dw 'No hay nada para buscar! Usage: exe -e | -f | -i',10;Mensaje a mostrar si no hay args
 noArgusLong: equ $-noArgus ;longitud
 
 mensaje: dw 'esfewrf',10
@@ -20,14 +20,19 @@ mensajel equ $-mensaje
 
 arge: dw '-e';arg -e
 argeLong: equ $-arge
+
 argf: dw '-f';arg -f
+argfLong: equ $-argf
+
 argi: dw '-i';arg -i
+argiLong: equ $-argi
 
 SECTION     .text
 
 global      _start
 
 _start:
+
     nop
     push    ebp
     mov     ebp, esp
@@ -40,6 +45,7 @@ _start:
     mov     ebx, 3
 
 DoNextArg:  
+
     mov     edi, dword [ebp + 4 * ebx]
     test    edi, edi
     jz      Exit
@@ -53,7 +59,7 @@ DoNextArg:
     jmp     DoNextArg
 
 NoArgs:
-   ; No args entered,
+   ; No args entered,   
    ; start program without args here
     mov eax,sys_write      ; call system 'write' id 4 
     mov ebx,stdout         ; descriptor de archivo 1 = pantalla 
@@ -63,19 +69,18 @@ NoArgs:
     jmp     Exit
 
 DisplayNorm:
-
-
-    ; push    ebx ;Esto me imprime el argumento que ingreso
-    ; mov     eax, sys_write
-    ; mov     ebx, stdout
-    ; int     80H 
-    ; mov     ecx, szLineFeed ;Esto imprime \n
-    ; mov     edx, 1
-    ; mov     eax, sys_write
-    ; mov     ebx, stdout
-    ; int     80H
-    ; pop     ebx
-    ; ret
+    
+    push    ebx ;Esto me imprime el argumento que ingreso
+    mov     eax, sys_write
+    mov     ebx, stdout
+    int     80H 
+    mov     ecx, szLineFeed ;Esto imprime \n
+    mov     edx, 1
+    mov     eax, sys_write
+    mov     ebx, stdout
+    int     80H
+    pop     ebx
+    ret
 
 
 CmpStrs:        

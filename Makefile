@@ -12,9 +12,9 @@ prgrep: args.asm
 clean:
 	rm -f *.o
 	rm -f example
-	rm -f exe
+	rm -f prgrep
 recompile:
 	rm -f example
-	rm -f exe
+	rm -f prgrep
 	rm -f *.o
 	make all
