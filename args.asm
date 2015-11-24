@@ -1,5 +1,5 @@
 MAXARGS     equ     5 ; 1 = program path 2 = 1st arg  3 = 2nd arg etc...
-sys_exit    equ     1
+sys_exit    equ     1 ; Llamadas de sistema 
 sys_read    equ     3
 sys_write   equ     4
 stdin       equ     0
@@ -9,25 +9,13 @@ stderr      equ     3
 SECTION     .data
 
 ;szErrMsg    db      "Too many arguments.  The max number of args is 4", 10
-;ERRLEN      equ     $-szErrMsg
+;ERRLEN      equ     $-szErrMsg ;Bloque de codigo si quiero limitar argumentos
 
 szLineFeed  dw      10 ;un \n
 noArgus: dw 'No hay nada para buscar! Usage: exe -e | -f | -i',10;Mensaje a mostrar si no hay args
 noArgusLong: equ $-noArgus ;longitud
 
-mensaje: dw 'esfewrf',10
-mensajel equ $-mensaje
-
-arge: dw '-e';arg -e
-argeLong: equ $-arge
-
-argf: dw '-f';arg -f
-argfLong: equ $-argf
-
-argi: dw '-i';arg -i
-argiLong: equ $-argi
-
-SECTION     .text
+SECTION     .text ;Main del programa
 
 global      _start
 
@@ -48,14 +36,14 @@ DoNextArg:
 
     mov     edi, dword [ebp + 4 * ebx]
     test    edi, edi
-    jz      Exit
+    jz      Exit                            ;Si es == 0
     call    GetStrlen
-    push    edx                             ; save string length for reverse
+    push    edx                             ; Longitud del string
     mov     ecx, dword [ebp + 4 * ebx]
-    call    DisplayNorm                     ; display arg text normally
-    pop     edi                             ; move string length into edi
+    call    DisplayNorm                     ; Mostrar texto de manera normal
+    pop     edi                             ; mover longitud al EDI
     mov     esi, dword [ebp + 4 * ebx]
-    inc     ebx                             ; step arg array index
+    inc     ebx                             ; Se aumenta la posición del arreglo de argumentos
     jmp     DoNextArg
 
 NoArgs:
@@ -63,10 +51,10 @@ NoArgs:
    ; start program without args here
     mov eax,sys_write      ; call system 'write' id 4 
     mov ebx,stdout         ; descriptor de archivo 1 = pantalla 
-    mov ecx,noArgus   ; guardo la cadena en un registro ecx 
-    mov edx,noArgusLong   ; guardo la cadena en un registro edx 
-    int 80h                 ; interrupcion para invocar al kernel           
-    jmp     Exit
+    mov ecx,noArgus        ; guardo la cadena en un registro ecx 
+    mov edx,noArgusLong    ; guardo la cadena en un registro edx 
+    int 80h                ; interrupcion para invocar al kernel           
+    jmp Exit               ; Salida del programa 
 
 DisplayNorm:
     
@@ -82,19 +70,15 @@ DisplayNorm:
     pop     ebx
     ret
 
+; StrsNotEqual:
+;     mov eax,sys_write      ; call system 'write' id 4 
+;     mov ebx,stdout         ; descriptor de archivo 1 = pantalla 
+;     mov ecx,mensaje   ; guardo la cadena en un registro ecx 
+;     mov edx,mensajel   ; guardo longitud de la cadena en un registro edx 
+;     int 80h                 ; interrupcion para invocar al kernel 
+;     jmp Exit
 
-CmpStrs:        
-
-
-StrsNotEqual:
-    mov eax,sys_write      ; call system 'write' id 4 
-    mov ebx,stdout         ; descriptor de archivo 1 = pantalla 
-    mov ecx,mensaje   ; guardo la cadena en un registro ecx 
-    mov edx,mensajel   ; guardo la cadena en un registro edx 
-    int 80h                 ; interrupcion para invocar al kernel 
-    jmp Exit
-
-GetStrlen:
+GetStrlen: ;me devuelve la longitud del argumento
     push    ebx
     xor     ecx, ecx
     not     ecx
@@ -107,26 +91,24 @@ GetStrlen:
     lea     edx, [ecx - 1]
     ret
 
-; TooManyArgs:
+; TooManyArgs: ;Bloque de codigo si quiero limitar argumentos
 ;     mov     eax, sys_write
 ;     mov     ebx, stdout
 ;     mov     ecx, szErrMsg
 ;     mov     edx, ERRLEN
 ;     int     80H
 
-EsArgE:
-    mov eax,sys_write      ; call system 'write' id 4 
-    mov ebx,stdout         ; descriptor de archivo 1 = pantalla 
-    mov ecx,mensaje   ; guardo la cadena en un registro ecx 
-    mov edx,mensajel   ; guardo la cadena en un registro edx 
-    int 80h                 ; interrupcion para invocar al kernel 
-    jmp Exit
+; EsArgE:
+;     mov eax,sys_write      ; call system 'write' id 4 
+;     mov ebx,stdout         ; descriptor de archivo 1 = pantalla 
+;     mov ecx,mensaje   ; guardo la cadena en un registro ecx 
+;     mov edx,mensajel   ; guardo la cadena en un registro edx 
+;     int 80h                 ; interrupcion para invocar al kernel 
+;     jmp Exit
 
-Exit:
-
+Exit: ;Salida del programa
     mov     esp, ebp
     pop     ebp
     mov     eax, sys_exit
     xor     ebx, ebx
     int     80H
-;
